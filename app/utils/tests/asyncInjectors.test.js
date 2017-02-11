@@ -2,11 +2,10 @@
  * Test async injectors
  */
 
+import expect from 'expect';
+import configureStore from '../../store';
 import { memoryHistory } from 'react-router';
 import { put } from 'redux-saga/effects';
-import { fromJS } from 'immutable';
-
-import configureStore from '../../store';
 
 import {
   injectAsyncReducer,
@@ -16,12 +15,12 @@ import {
 
 // Fixtures
 
-const initialState = fromJS({ reduced: 'soon' });
+const initialState = { reduced: 'soon' };
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case 'TEST':
-      return state.set('reduced', action.payload);
+      return { ...state, reduced: action.payload };
     default:
       return state;
   }
@@ -39,7 +38,7 @@ describe('asyncInjectors', () => {
   let store;
 
   describe('getAsyncInjectors', () => {
-    beforeAll(() => {
+    before(() => {
       store = configureStore({}, memoryHistory);
     });
 
@@ -49,10 +48,10 @@ describe('asyncInjectors', () => {
       injectReducer('test', reducer);
       injectSagas(sagas);
 
-      const actual = store.getState().get('test');
-      const expected = initialState.merge({ reduced: 'yup' });
+      const actual = store.getState().test;
+      const expected = { ...initialState, reduced: 'yup' };
 
-      expect(actual.toJS()).toEqual(expected.toJS());
+      expect(actual).toEqual(expected);
     });
 
     it('should throw if passed invalid store shape', () => {
@@ -66,12 +65,12 @@ describe('asyncInjectors', () => {
         result = err.name === 'Invariant Violation';
       }
 
-      expect(result).toBe(true);
+      expect(result).toEqual(true);
     });
   });
 
   describe('helpers', () => {
-    beforeAll(() => {
+    before(() => {
       store = configureStore({}, memoryHistory);
     });
 
@@ -81,19 +80,10 @@ describe('asyncInjectors', () => {
 
         injectReducer('test', reducer);
 
-        const actual = store.getState().get('test');
+        const actual = store.getState().test;
         const expected = initialState;
 
-        expect(actual.toJS()).toEqual(expected.toJS());
-      });
-
-      it('should not assign reducer if already existing', () => {
-        const injectReducer = injectAsyncReducer(store);
-
-        injectReducer('test', reducer);
-        injectReducer('test', () => {});
-
-        expect(store.asyncReducers.test.toString()).toEqual(reducer.toString());
+        expect(actual).toEqual(expected);
       });
 
       it('should throw if passed invalid name', () => {
@@ -113,7 +103,7 @@ describe('asyncInjectors', () => {
           result = err.name === 'Invariant Violation';
         }
 
-        expect(result).toBe(true);
+        expect(result).toEqual(true);
       });
 
       it('should throw if passed invalid reducer', () => {
@@ -133,7 +123,7 @@ describe('asyncInjectors', () => {
           result = err.name === 'Invariant Violation';
         }
 
-        expect(result).toBe(true);
+        expect(result).toEqual(true);
       });
     });
 
@@ -143,10 +133,10 @@ describe('asyncInjectors', () => {
 
         injectSagas(sagas);
 
-        const actual = store.getState().get('test');
-        const expected = initialState.merge({ reduced: 'yup' });
+        const actual = store.getState().test;
+        const expected = { ...initialState, reduced: 'yup' };
 
-        expect(actual.toJS()).toEqual(expected.toJS());
+        expect(actual).toEqual(expected);
       });
 
       it('should throw if passed invalid saga', () => {
@@ -166,7 +156,7 @@ describe('asyncInjectors', () => {
           result = err.name === 'Invariant Violation';
         }
 
-        expect(result).toBe(true);
+        expect(result).toEqual(true);
       });
     });
   });

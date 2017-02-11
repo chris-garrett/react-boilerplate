@@ -1,5 +1,4 @@
-import { fromJS } from 'immutable';
-
+import update from 'immutability-helper';
 import appReducer from '../reducer';
 import {
   loadRepos,
@@ -10,26 +9,26 @@ import {
 describe('appReducer', () => {
   let state;
   beforeEach(() => {
-    state = fromJS({
+    state = {
       loading: false,
       error: false,
       currentUser: false,
-      userData: fromJS({
+      userData: {
         repositories: false,
-      }),
-    });
+      },
+    };
   });
 
   it('should return the initial state', () => {
-    const expectedResult = state;
-    expect(appReducer(undefined, {})).toEqual(expectedResult);
+    expect(appReducer(undefined, {})).toEqual(state);
   });
 
   it('should handle the loadRepos action correctly', () => {
-    const expectedResult = state
-      .set('loading', true)
-      .set('error', false)
-      .setIn(['userData', 'repositories'], false);
+    const expectedResult = update(state, {
+      loading: { $set: true },
+      error: { $set: false },
+      userData: { repositories: { $set: false } },
+    });
 
     expect(appReducer(state, loadRepos())).toEqual(expectedResult);
   });
@@ -39,10 +38,11 @@ describe('appReducer', () => {
       name: 'My Repo',
     }];
     const username = 'test';
-    const expectedResult = state
-      .setIn(['userData', 'repositories'], fixture)
-      .set('loading', false)
-      .set('currentUser', username);
+    const expectedResult = update(state, {
+      loading: { $set: false },
+      currentUser: { $set: username },
+      userData: { repositories: { $set: fixture } },
+    });
 
     expect(appReducer(state, reposLoaded(fixture, username))).toEqual(expectedResult);
   });
@@ -51,9 +51,7 @@ describe('appReducer', () => {
     const fixture = {
       msg: 'Not found',
     };
-    const expectedResult = state
-      .set('error', fixture)
-      .set('loading', false);
+    const expectedResult = { ...state, error: fixture, loading: false };
 
     expect(appReducer(state, repoLoadingError(fixture))).toEqual(expectedResult);
   });
