@@ -6,30 +6,30 @@ import { createSelector } from 'reselect';
 
 const selectGlobal = () => (state) => state.global;
 
-const selectCurrentUser = () => createSelector(
+const makeSelectCurrentUser = () => createSelector(
   selectGlobal(),
   (globalState) => globalState.currentUser
 );
 
-const selectLoading = () => createSelector(
+const makeSelectLoading = () => createSelector(
   selectGlobal(),
   (globalState) => globalState.loading
 );
 
-const selectError = () => createSelector(
+const makeSelectError = () => createSelector(
   selectGlobal(),
   (globalState) => globalState.error
 );
 
-const selectRepos = () => createSelector(
+const makeSelectRepos = () => createSelector(
   selectGlobal(),
   (globalState) => globalState.userData.repositories
 );
 
 export {
   selectGlobal,
-  selectCurrentUser,
-  selectLoading,
-  selectError,
-  selectRepos,
+  makeSelectCurrentUser,
+  makeSelectLoading,
+  makeSelectError,
+  makeSelectRepos,
 };
